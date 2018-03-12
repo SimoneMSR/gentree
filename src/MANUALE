@@ -1,0 +1,128 @@
+Questo manuale contiene le guide per l'installazione del sistema GenTree e l'uso in modalità testuale e grafica. 
+
+//INSTALLAZIONE// 
+Per la compilazione dei sorgenti è necessario aver installato le seguenti librerie: 
+-GSL
+-GLUT 
+-GLUI
+-OSI
+-OGDF
+
+
+il compilatore g++ e il software di conversione da file gml a immagini png: gml2pic . Il path contenente la libreria OSI in questo manuale verra' chiamato OSI_LIB_PATH. 
+
+Scompattare l'archivio ed accedere alla directory “sorgente” e da qui modificare il makefile con i PATH per il linking dei codici oggetto delle librerie installate. 
+Dare il comando 
+
+make 
+
+L'eseguibile GenTree verrà salvato nella cartella in cui è stato scompattato l'archivio. 
+
+//USO// 
+Al lancio del programma, in entrambe le modalità di seguito descritte, viene creata la cartella di lavoro TMP_t_w_d (se non esistente). 
+
+MODALITA' TESTUALE 
+Il programma in questa modalità è lanciato tramite il comando 
+export LD_LIBRARY_PATH=OSI_LIB_PATH &&./GenTree dataset_filename [-g gtm_output_filename] [-p parameter_filename] -C hidden_states -P RBF_dimension -L lambda -S stationary -E eras -V verbose_level 
+
+dove  OSI_LIB_PATH indica il path di installazione della libreria OSI.
+
+Questa modalità permette di allenare il modello :
+-specificando il file che contiene il dataset 
+-specificando i parametri di apprendimento 
+	*tramite l'elencazione diretta da linea di comando 
+	*tramite un file di configurazione da specificare nel 		comando 
+
+Il formato del file di configurazione è una semplice sequenza di valori di parametri di apprendimento: stati nascoti – dimensione della matrice RBF – valore del parametro di stabilizzazione lambda – stazionarietà – epoche – verbosità 
+
+Dopo il lancio del programma verranno stampati dei messaggi di stato o errore a seconda del valore di verbosità: 
+
+-0 : nessun messaggio 
+-1 : messaggi di errore per valori di parametri di apprendimento invalidi, messaggi sullo stato dell'apprendimento (Loglikelihood, varianza, epoca corrente e tempo di esecuzione), messaggi di info riguardanti l'uso della decomposizione SVD in sostituzione di quella di Cholesky 
+-2 : tutti i messaggi stampati dal livello 1 di verbosità, messaggi di info su normalizzazioni effettuate per overflow o underflow 
+
+MODALITA' GRAFICA 
+Il programma in questa modalità è lanciato tramite 
+
+export LD_LIBRARY_PATH=OSI_LIB_PATH && ./GenTree
+
+dove  OSI_LIB_PATH indica il path di installazione della libreria OSI.
+
+Se nella working directory corrente non è presente un file (o un collegamento al file) eseguibile gml2pic, viene aperta una finestra di dialogo con cui si può specificare la posizione del convertitore. 
+A questo punto viene aperta una finestra di controllo divisa in tre pannelli, da cui è possibile 1) apprendere/caricare una mappa e selezionare un dataset, 2) impostare la proiezione, 3) e visualizzare le proiezioni. 
+
+
+1) Selezione della mappa e del dataset: 
+-apprendimento : impostare i parametri di apprendimento tramite gli spinbox e i checkbox. Cliccare sul tasto TRAIN GTM e tramite il browser selezionare il dataset di apprendimento. Durante i cicli di apprendimento è possibile tenere traccia della percentuale di avanzamento, della Likelihood e della varianza. 
+
+-caricamento: cliccare sul tasto LOAD GTM e selezionare il file tramite il browser 
+
+A termine della selezione della mappa è possibile caricare il dataset di proiezione cliccando sul tasto LOAD DATASET, oppure salvare la mappa cliccando sul tasto SAVE GTM. 
+
+Una finestra di avviso segnalerà eventuali problemi nella selezione della mappa o del dataset. 
+
+Dopo aver selezionato correttamente la mappa è possibile proiettare gli alberi. 
+
+2) Impostazione della proiezione: 
+L'insieme di alberi da proiettare è determinato combinando queste due modalità di selezione: 
+
+-selezione per livello (solo le radici, solo i nodi ad un certo livello, tutti i nodi) 
+-selezione per albero (un solo albero,una lista di alberi, tutti gli alberi) 
+
+La selezione dell'insieme di nodi da proiettare avviene tramite i checkbox, radiusbox e spinbox del secondo pannello. 
+
+La selezione della lista di alberi può essere fatta specificando in un'apposita finestra di dialogo la lista dei nomi degli alberi separati da “ ; “, oppure selezionando un file in cui sono stati inseriti i nomi, con lo stesso formato. 
+
+La selezione di conferma con i tasti SET MAP o ADD TREES. Il primo tasto assegna all'insieme di proiezione la selezione specificata, il secondo aggiunge ad esso la selezione. 
+Una finestra di avviso segnalerà eventuali problemi o valori non corretti nella selezione degli alberi. 
+
+A selezione terminata correttamente si accede al pannello di proiezione. 
+
+3) Visualizzazione 
+Il sistema offre tre modalità di proiezione: 
+ 
+-mappa 
+-griglia 
+-istogramma 
+
+**MAPPA** 
+
+La mappa visualizza in una finestra gli alberi selezionati associando ad ognuno di essi la proiezione media nello sottospazio di R^2 [-1,1]x[-1,1]. Il punto associato ad un albero può essere un semplice punto all'interno della mappa, o una figura geometrica (quadrato, triangolo, cerchio) colorata (10 colori) : la selezione è fatta con il checkbox CLASSES. Il numero massimo di classi distinguibili con questa simbologia è 30.  
+
+NOTA: la forma geometrica o il solo colore di due punti non indica alcuna relazione fra le classi degli alberi associati. 
+
+La mappa è navigabile: 
+-portandosi con il mouse sopra un punto proiettato verrà visualizzato il nome dell'albero e le coordinate del punto 
+-con il tasti '+' e '-' della tastiera si effettua lo zoom in e out 
+-cliccando con entrambi i tasti del mouse si riporta la mappa in condizioni di zoom e traslazione iniziali 
+-cliccando con il tasto destro e scorrendo con il mouse si trasla la mappa all'interno della finestra 
+-cliccando con il tasto sinistro del mouse su un punto proiettato si apre una finestra che visualizza la struttura dell'albero a cui appartiene il nodo (evidenziato nella struttura con un colore diverso) 
+
+La finestra di visualizzazione a mappa si apre cliccando sul tasto PROJECT .
+
+**GRIGLIA** 
+
+La griglia visualizza lo spazio [-1,1]x[-1,1] di proiezione suddiviso in n zone o celle monocromatiche, dove n è il numero specificato nello spinbox CELLS. L'intensità del colore di una cella è proporzionale al numero di alberi la cui proiezione media appartiene alla zona. 
+
+La griglia è navigabile: 
+-portandosi con il mouse sopra una cella, verrà visualizzato il numero di alberi contenuti 
+-cliccando con il tasto sinistro del mouse su una cella si opera uno zoom: la griglia mostra lo spazio [a,b]x[c,d] delimitato dalla cella cliccata, suddiviso in n nuove zone 
+-cliccando con il tasto destro del mouse si fa zoom out 
+
+Durante la navigazione, sui bordi della griglia, vengono visualizzati gli estremi dello spazio proiettato [a,b]x[c,d]. 
+Se durante la navigazione nella griglia la finestra della mappa è aperta, quest'ultima visualizza la stessa zona di proiezione della griglia (zoom e traslazione). 
+ 
+La finestra di visualizzazione a griglia si apre cliccando sul tasto GRID. 
+
+ **ISTOGRAMMA** 
+
+La finestra mostra un diagramma che indica, per ogni stato nascosto x, il numero di alberi la cui proiezione modale coincide con x. Ogni barra del diagramma è posta nel centro della Gaussiana associata allo stato nascosto. Un asse laterale mostra la scala di misurazione del numero di alberi. 
+
+L'istogramma è navigabile: 
+-con i tasti '+' e '-' della tastiera si effettua lo zoom in e out 
+-cliccando con entrambi i tasti del mouse si riporta la mappa in condizioni di zoom e traslazione iniziali 
+-con il tasto sinistro del mouse si effettua una rotazione omnidirezionale dell'immagine 
+-con il tasto destro del mouse si trasla l'istogramma all'interno della finestra 
+La finestra di visualizzazione a istogramma si apre cliccando sul tasto HISTOGRAM. 
+
+Le quattro finestre di visualizzazione (mappa, struttura, griglia, istogramma) si chiudono con il tasto della tastiera 'q'. Con il tasto 's' della tastiera, invece, le finestre vengono salvate in formato pnm nella cartella di lavoro.
